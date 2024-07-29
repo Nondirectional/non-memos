@@ -18,18 +18,17 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState?.save();
       // 这里可以添加处理登录逻辑的代码
       ApiCaller apiCaller = ApiCaller();
-      apiCaller.dioInstance
-          .post(
-              RequestUris.signin.uri +
-                  '?username=$_username&password=$_password&neverExpire=true',
-              options: Options(headers: {"Access-Control-Allow-Origin": "*"}))
-          .then((value) => {
-                value.headers.forEach((key, value) {
-                  print('response header: $key ,value : $value');
-                })
-              })
-          .onError((error, trace) =>
-              {print(error.toString() + "\n" + trace.toString())});
+      apiCaller.signin(_username, _password, false)
+      ?.then((value){
+        print(value.statusCode);
+        print("object");
+      }).onError((error,trace){
+        print(error);
+        print(trace);
+      });
+
+
+
     }
   }
 

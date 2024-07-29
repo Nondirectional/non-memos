@@ -1,5 +1,5 @@
 enum RequestUris {
-  signin('/memos.api.v1.AuthService/SignIn');
+  signin('/api/v1/auth/signin');
 
   final String uri;
 
