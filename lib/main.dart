@@ -6,6 +6,8 @@ import 'package:non_memos/providers/access_token_provider.dart';
 import 'package:non_memos/providers/logged_sate_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'key/global_keys.dart';
+
 void main() {
   runApp(MultiProvider(
     providers: [
@@ -13,6 +15,9 @@ void main() {
       ChangeNotifierProvider(create: (context) => AccessTokenProvider()),
     ],
     child: MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      debugShowMaterialGrid: false,
+      scaffoldMessengerKey: GlobalKeys.scaffoldMessengerKey,
       routerConfig: GoRouter(
           routes: [
             GoRoute(path: "/", builder: (context, state) => const HomePage()),
@@ -23,7 +28,7 @@ void main() {
           ],
           redirect: (context, state) {
             final LoggedSateProvider loggedState =
-                Provider.of<LoggedSateProvider>(context);
+                Provider.of<LoggedSateProvider>(context,listen: false);
             final bool inLoginPage = state.uri.path == '/login';
             if (!loggedState.isLoggedIn && !inLoginPage) {
               print("current user has not logged,redirect to login page.");

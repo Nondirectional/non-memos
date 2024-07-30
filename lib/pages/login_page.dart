@@ -1,34 +1,40 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:non_memos/component/api_caller.dart';
-import 'package:non_memos/component/requst_uris.dart';
+import 'package:non_memos/providers/logged_sate_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../key/global_keys.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   late String _username;
   late String _password;
+  bool loggedIn = false;
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState?.save();
-      // 这里可以添加处理登录逻辑的代码
       ApiCaller apiCaller = ApiCaller();
-      apiCaller.signin(_username, _password, false)
-      ?.then((value){
-        print(value.statusCode);
-        print("object");
-      }).onError((error,trace){
-        print(error);
-        print(trace);
-      });
-
-
-
+      Response? response = await apiCaller.signin(_username, _password, false);
+      if (response != null) {
+        setState(() {
+          loggedIn = true;
+          LoggedSateProvider loggedSate =
+          Provider.of<LoggedSateProvider>(context, listen: false);
+          loggedSate.login();
+          GoRouter.of(context).go('/');
+        });
+      }
     }
   }
 
@@ -46,13 +52,14 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: '用户名'),
+                decoration: const InputDecoration(labelText: '用户名'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return '请输入用户名';
                   }
                   return null;
                 },
+                onFieldSubmitted: (value) => FocusScope.of(context).nextFocus(),
                 onSaved: (value) => _username = value!,
               ),
               TextFormField(
@@ -64,13 +71,14 @@ class _LoginPageState extends State<LoginPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (value) => FocusScope.of(context).nextFocus(),
                 onSaved: (value) => _password = value!,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: MaterialButton(
                   onPressed: _submitForm,
-                  child: Text('登录'),
+                  child: const Text('登录'),
                 ),
               ),
             ],
